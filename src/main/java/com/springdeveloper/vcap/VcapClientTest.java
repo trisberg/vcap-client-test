@@ -6,8 +6,9 @@ import java.net.URL;
 import java.util.List;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.rest.CloudControllerClient;
+import org.cloudfoundry.client.lib.rest.CloudControllerClientV1;
 
 /**
  * Simple test of CLoud Foundry VCAP connectivity.
@@ -19,6 +20,7 @@ public class VcapClientTest {
 	private static final String CC_URL = System.getProperty("vcap.target", "https://api.cloudfoundry.com");
 	private static String vcap_email = System.getProperty("vcap.email");
 	private static String vcap_passwd = System.getProperty("vcap.passwd");
+	private static final String uaa_url = System.getProperty("uaa.url", "https://uaa.cloudfoundry.com");
 
 	public static void main(String[] args) {
 
@@ -33,24 +35,28 @@ public class VcapClientTest {
         }
 		
 		System.out.println("Running tests on " + CC_URL + " on behalf of " + vcap_email);
+		System.out.println("Authenticating against: " + uaa_url);
+		
+		CloudCredentials credentials = new CloudCredentials(vcap_email, vcap_passwd);
 
-		CloudFoundryClient client = null;
+		CloudControllerClient ccc = null;
+		
 		try {
-			client = new CloudFoundryClient(new CloudCredentials(vcap_email, vcap_passwd), new URL(CC_URL));
+			ccc= new CloudControllerClientV1(new URL(CC_URL), null, credentials, new URL(uaa_url));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
 
-		client.login();
+		ccc.login();
 		
-		List<CloudApplication> apps = client.getApplications();
+		List<CloudApplication> apps = ccc.getApplications();
 		
 		System.out.println("Apps:");
 		for (CloudApplication app : apps) {
 			System.out.println("  " + app.getName() + " " + app.getState());
 		}
 		
-		client.logout();
+		ccc.logout();
 
 	}
 }
