@@ -9,6 +9,7 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientV1;
+import org.cloudfoundry.client.lib.util.RestUtil;
 
 /**
  * Simple test of CLoud Foundry VCAP connectivity.
@@ -42,7 +43,7 @@ public class VcapClientTest {
 		CloudControllerClient ccc = null;
 		
 		try {
-			ccc= new CloudControllerClientV1(new URL(CC_URL), null, credentials, new URL(uaa_url));
+			ccc= new CloudControllerClientV1(new URL(CC_URL), new RestUtil(), credentials, new URL(uaa_url), null);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -50,13 +51,37 @@ public class VcapClientTest {
 		ccc.login();
 		
 		List<CloudApplication> apps = ccc.getApplications();
-		
+
 		System.out.println("Apps:");
 		for (CloudApplication app : apps) {
 			System.out.println("  " + app.getName() + " " + app.getState());
 		}
-		
+
+		String logs = ccc.getFile("mongosv-rest", 0, "/logs", -1, -1);
+		System.out.println(logs);
+		System.out.println(printBytes(logs.getBytes()));
+
 		ccc.logout();
 
 	}
+
+	private static String printBytes(byte[] array) {
+		StringBuilder printable = new StringBuilder();
+		printable.append("[" + array.length + "] = " + "0x");
+		for (int k = 0; k < array.length; k++) {
+			printable.append(byteToHex(array[k]));
+		}
+		return printable.toString();
+	}
+
+	private static String byteToHex(byte b) {
+		// Returns hex String representation of byte b
+		char hexDigit[] = {
+				'0', '1', '2', '3', '4', '5', '6', '7',
+				'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+		};
+		char[] array = {hexDigit[(b >> 4) & 0x0f], hexDigit[b & 0x0f]};
+		return new String(array);
+	}
+
 }
