@@ -63,12 +63,15 @@ public class VcapClientTest {
 		System.out.println(printBytes(logs.getBytes()));
 
 		System.out.println(printBytes(System.getProperty("line.separator").getBytes()));
-		System.out.println(printBytes(String.valueOf(0xa).getBytes()));
+
+		String separator = new String(new byte[] {0xa});
+
+		System.out.println(printBytes(separator.getBytes()));
 
 		String[] lines1 = logs.split(System.getProperty("line.separator"));
 		System.out.println(Arrays.asList(lines1));
 
-		String[] lines2 = logs.split(String.valueOf(0xa));
+		String[] lines2 = logs.split(separator);
 		System.out.println(Arrays.asList(lines2));
 
 		ccc.logout();
