@@ -3,6 +3,7 @@ package com.springdeveloper.vcap;
 import java.io.Console;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
@@ -62,13 +63,13 @@ public class VcapClientTest {
 		System.out.println(printBytes(logs.getBytes()));
 
 		System.out.println(printBytes(System.getProperty("line.separator").getBytes()));
-		System.out.println(printBytes(String.valueOf(0x0a).getBytes()));
+		System.out.println(printBytes(String.valueOf(0xa).getBytes()));
 
 		String[] lines1 = logs.split(System.getProperty("line.separator"));
-		System.out.println(lines1);
+		System.out.println(Arrays.asList(lines1));
 
-		String[] lines2 = logs.split(String.valueOf(0x0a));
-		System.out.println(lines2);
+		String[] lines2 = logs.split(String.valueOf(0xa));
+		System.out.println(Arrays.asList(lines2));
 
 		ccc.logout();
 
